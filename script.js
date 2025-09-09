@@ -69,3 +69,46 @@ document.addEventListener('keydown', function(event) {
 display.addEventListener('input', function() {
     this.value = this.value.replace(/[^0-9+\-*/.]/g, '');
 });
+// ... your existing calculator code ...
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('✅ Service Worker registered successfully:', registration);
+      })
+      .catch(error => {
+        console.log('❌ Service Worker registration failed:', error);
+      });
+  });
+}
+
+// PWA Install Prompt (optional enhancement)
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('💡 PWA install prompt available');
+  // Prevent Chrome 67 and earlier from automatically showing the prompt
+  e.preventDefault();
+  // Stash the event so it can be triggered later
+  deferredPrompt = e;
+  
+  // Optionally show your own install button
+  // showInstallButton();
+});
+
+// Optional: Add install button functionality
+function showInstallPrompt() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('✅ User accepted the PWA install prompt');
+      } else {
+        console.log('❌ User dismissed the PWA install prompt');
+      }
+      deferredPrompt = null;
+    });
+  }
+}
